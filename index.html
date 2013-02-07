@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<title>GeoJSON Tools</title>
+    <script src="geojsontools.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    
+    <script>
+    
+        function convert(){
+            $('#output').val(JSON.stringify(GeoJSONTools.points_to_lineString($('#input').val())));
+        };
+    
+    </script>
+    
+    <style>
+    
+        textarea
+        {
+            font-family:monospace;
+            width:45%;
+            height: 300px;
+        }
+        
+        .jsoncontainer
+        {
+            display: inline;
+        }
+        
+        body
+        {
+            text-align:center;
+        }
+    
+    </style>
+    
+    <body>
+        <div class="jsoncontainer">
+            <textarea id="input">Input</textarea>
+        </div>
+        <div class="jsoncontainer">
+            <textarea id="output"></textarea>
+        </div>
+        <div id="buttoncontainer">
+            <button onclick="convert();">Points to Line</button>
+        </div>
+        
+    </body>
+    
+</html>
