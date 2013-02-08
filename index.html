@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
 	<title>GeoJSON Tools</title>
-    <script src="geojsontools.js"></script>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    
-    <script>
-    
-        function convert(){
-            $('#output').val(JSON.stringify(GeoJSONTools.points_to_lineString($('#input').val())));
-        };
-    
-    </script>
-    
+
+    <script src="jsonlint.js"></script>
+    <script src="formatter.js"></script>
+
+    <script src="geojsontools.js"></script>
+    <script src="func.js"></script>
+
+
     <style>
     
         textarea
         {
             font-family:monospace;
             width:45%;
-            height: 300px;
+            height: 630px;
+            margin: 1em;
         }
         
         .jsoncontainer
@@ -32,18 +33,22 @@
         }
     
     </style>
-    
+
     <body>
+
         <div class="jsoncontainer">
-            <textarea id="input">Input</textarea>
+            <textarea id="input" spellcheck="false">Input</textarea>
         </div>
         <div class="jsoncontainer">
-            <textarea id="output"></textarea>
+            <textarea id="output" spellcheck="false"></textarea>
         </div>
         <div id="buttoncontainer">
-            <button onclick="convert();">Points to Line</button>
+            <button onclick="func.convert();">Points to Line</button>
         </div>
-        
+
+        <script>
+            $('#input').val(JSON.stringify(testPoints));
+        </script>  
     </body>
-    
+
 </html>
