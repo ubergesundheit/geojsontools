@@ -9,12 +9,20 @@ var func = (function () {
     var f = {
         convert: function () {
             var input = $('#input').val();
-            var output = JSON.stringify(GeoJSONTools.points_to_lineString($('#input').val()));
+            var output = JSON.stringify(GeoJSONTools.points_to_lineString($('#input').val(),{ignoreProperties: true}));
             $('#input').val(formatter.formatJson($('#input').val()));
             $('#output').val(output);
-            $('#output').val(formatter.formatJson($('#output').val()));
+            //$('#output').val(formatter.formatJson($('#output').val()));
+        },
+        test: function () {
+            var json = { "type": "Point", "coordinates": [100.0, 0.0] };
+            if(json.type === "MultiPoint"){
+                console.log('yes');
+            }
         }
     };
 
     return f;
 }());
+
+console.log(GeoJSONTools.parse(JSON.stringify(testPoints)));
