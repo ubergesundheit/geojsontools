@@ -57,85 +57,120 @@ var GeoJSONTools = (function () {
     };
     var public_gjt = {
         parse:function (geojson) {
-            var input = jsonlint.parse(geojson),
-                checkGeoJSONObject = function(geoJSON){
-                    
-                },
+            var input = {},
                 //test an array if it contains two valid coordinates
                 //assumes parameter point to be an array.
                 testPointCoordinate = function (point) {
-                    if(point.length === 2){
-                        if(isNaN(parseFloat(point[0])) || isNaN(parseFloat(point[1]))){
-                            //throw error: point coordinates not float
-                        }
+                    if(point.length === 2 || point.length === 3){
+						var good = true;
+						for(var i = 0; i<point.length; i++){
+							if(isNaN(parseFloat(point[i]))){
+								throw new Error("error: point coordinates not float");
+							}	
+						}
+						return true;
                     } else {
-                        //throw error: invalid coordinate count
+                        throw new Error("error: invalid coordinate count");
                     }
                 },                
                 //test if the contents of an array 
                 checkMultiPointLineString = function (coords) {
-                    for(var i = 0; i< key.length; i++){
-                        if(Array.isArray(key[i])){
-                            testPointCoordinate(key[i]);
+                    for(var i = 0; i< coords.length; i++){
+                        if(Array.isArray(coords[i])){
+                            return testPointCoordinate(coords[i]);
                         }else{
-                            //throw error: invalid coordinates
+                            throw new Error("error: invalid coordinates");
                         }
                     }
                 },
+				checkMultiLineString = function (coords) {
+					for(var i = 0; i< coords.length; i++){
+						return checkMultiPointLineString(coords[i]);
+					}
+				},
                 testGeometry = function (geometry) {
-                            if(input.hasOwnProperty('coordinates')){
-                                if(Array.isArray(input.coordinates)){
-                                    switch (key) {
-                                        case "Point":
-                                            testPointCoordinate(key);
-                                            break;
-                                        case "MultiPoint":
-                                            checkMultiPointLineString(key);
-                                            break;
-                                        case "LineString":
-                                            checkMultiPointLineString(key);
-                                            break;
-                                        case "MultiLineString":
-
-                                            break;
-                                        case "Polygon":
-
-                                            break;
-                                        case "MultiPolygon":
-
-                                            break;
-                                        default:
-
-                                            break;
-                                    }
-                                }else{
-                                    //throw error: property 'coordinates' not of type Array
-                                }
-                            }else{
-                                //throw error: missing property 'coordinates'
-                            }
-                };
-
+					if(Array.isArray(geometry.coordinates)){
+						switch (geometry.type) {
+							case "Point":
+								return testPointCoordinate(geometry.coordinates);
+							case "MultiPoint":
+								return checkMultiPointLineString(geometry.coordinates);
+							case "LineString":
+								return checkMultiPointLineString(geometry.coordinates);
+							case "MultiLineString":
+								return checkMultiLineString(geometry.coordinates);
+							case "Polygon":
+								throw new Error("error: Polygon not implemented yet");
+								break;
+							case "MultiPolygon":
+								throw new Error("error: MultiPolygon not implemented yet");
+								break;
+							default:
+								throw new Error("error: unknown Geometry type '"+geometry.type+"'");
+								break;
+						}
+					}else{
+						throw new Error("error: property 'coordinates' not of type Array");
+					}
+                },
+				testFeature = function (feature) {
+					if(feature.hasOwnProperty('geometry')){
+						return testGeometry(feature.geometry);
+					} else {
+						throw new Error("error: missing 'geometry' property");
+					}
+					if(!feature.hasOwnProperty('properties')){
+						throw new Error("error: missing 'properties' property");
+					}
+				},
+				testFeatureCollection = function (featureCollection) {
+					if(featureCollection.hasOwnProperty('features')){
+						if(Array.isArray(featureCollection.features)){
+							for(var i = 0; i< featureCollection.features.length; i++){
+								return testFeature(featureCollection.features[i]);
+							}
+						} else {
+							throw new Error("error: property 'features' not of type Array");
+						}
+					} else {
+						throw new Error("error: missing 'features' property");
+					}
+				};
+			//determine if the input is already valid json
+			if (typeof geojson === 'string'){
+				input = jsonlint.parse(geojson);
+			} else {
+				input = geojson;
+			}
+			
             for (var key in input) {
                 if (input.hasOwnProperty(key)) {
                     if (key === "type") {
-                        if (key === "Point" || key === "MultiPoint" || key === "LineString" || key === "MultiLineString" || key === "Polygon" || key === "MultiPolygon") {
-                            if(input.hasOwnProperty('geometry')){
-                                
-                            }else{
-                                //throw error: missing property 'geometry'
-                            }
-                        } else if (key === "Feature" || key === "FeatureCollection") {
-                            
+                        if (input[key] === "Point" || 
+							input[key] === "MultiPoint" || 
+							input[key] === "LineString" || 
+							input[key] === "MultiLineString" || 
+							input[key] === "Polygon" || 
+							input[key] === "MultiPolygon") {
+								if(input.hasOwnProperty('coordinates')){
+									return testGeometry(input);
+								}else{
+									throw new Error("error: missing property 'coordinates'");
+								}
+                        } else if (input[key] === "Feature") {
+                            return testFeature(input);
+						} else if (input[key] === "FeatureCollection") {
+							return testFeatureCollection(input);
+						} else if (input[key] === "GeometryCollection") {
+							console.log('this is a GeometryCollection');
                         } else {
-                            //throw error: invalid value in property 'type'
+                            throw new Error("error: invalid value in property 'type'");
                         }
                     } else {
-                        //throw error: missing property 'type'
+						throw new Error("error: missing property 'type'");
                     }
                 }
             }
-
 
         },
         /* converts a GeoJson FeatureCollection consisting of points to
