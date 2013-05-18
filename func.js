@@ -12,8 +12,8 @@ var func = (function () {
         convert: function () {
             var input = $('#input').val();
             var output = JSON.stringify(GeoJSONTools.points_to_lineString($('#input').val(),{ignoreProperties: true}));
-            $('#input').val(formatter.formatJson($('#input').val()));
-            $('#output').val(formatter.formatJson(output));
+            $('#input').val(JSON.stringify($('#input').val(),null,2));
+            $('#output').val(JSON.stringify(output,null,2));
             //$('#output').val(formatter.formatJson($('#output').val()));
         },
         test: function () {
