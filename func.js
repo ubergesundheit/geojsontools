@@ -17,14 +17,12 @@ var func = (function () {
             //$('#output').val(formatter.formatJson($('#output').val()));
         },
         test: function () {
-            var json = { "type": "Point", "coordinates": [100.0, 0.0] };
-            if(json.type === "MultiPoint"){
-                console.log('yes');
-            }
+            var input = $('#input').val();
+			console.log(GeoJSONTools.parse(input));
         }
     };
 
     return f;
 }());
 
-console.log(GeoJSONTools.parse(testPoints));
+//console.log(GeoJSONTools.parse(testPoints));

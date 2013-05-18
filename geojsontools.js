@@ -138,7 +138,8 @@ var GeoJSONTools = (function () {
 				};
 			//determine if the input is already valid json
 			if (typeof geojson === 'string'){
-				input = jsonlint.parse(geojson);
+				//input = jsonlint.parse(geojson);
+				input = JSON.parse(geojson);
 			} else {
 				input = geojson;
 			}
@@ -180,7 +181,8 @@ var GeoJSONTools = (function () {
          *               ignoreProperties: tells the converter to ignore the properties of the input
          */
         points_to_lineString:function (geojson, options) {
-            var input = jsonlint.parse(geojson), //use jsonlint to check for valid JSON
+            //var input = jsonlint.parse(geojson), //use jsonlint to check for valid JSON
+			var input = JSON.parse(geojson), //use jsonlint to check for valid JSON
                 output_coordinates = [],
                 output_properties = {},
                 ct_properties = 0,
